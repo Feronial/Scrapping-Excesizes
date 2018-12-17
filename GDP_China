@@ -1,0 +1,39 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+df = pd.DataFrame(columns = ['City','Gdp'], index = [0])
+
+gdp_Rnb = dict()
+
+gdp_Dollar = dict()
+
+web_Url = requests.get('https://en.wikipedia.org/wiki/List_of_Chinese_prefecture-level_cities_by_GDP')
+
+soup = BeautifulSoup(web_Url.text, 'lxml')
+
+gdp_Table = soup.find('table',{'class':'wikitable sortable'})
+
+tr = gdp_Table.findAll('tr')
+
+i = 0
+k = 0
+
+for row in tr:
+    if i == 0:
+        
+        i += 1
+        continue
+    
+    cell_td = row.findAll('td')
+    cell_th = row.findAll('th')
+    
+    df.loc[k, 'City'] = cell_td[1].text
+    df.loc[k, 'Gdp'] = cell_td[3].text
+    
+    k += 1
+    
+    gdp_Rnb[cell_td[1].text] = cell_td[3].text
+    
+    gdp_Dollar[cell_td[1].text] = cell_td[4].text
+    
